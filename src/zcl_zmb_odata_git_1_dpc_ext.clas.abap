@@ -8,6 +8,10 @@ protected section.
 
   methods SOHEADERSET_GET_ENTITY
     redefinition .
+  methods SOHEADERSET_GET_ENTITYSET
+    redefinition .
+  methods SOHEADERSET_CREATE_ENTITY
+    redefinition .
 private section.
 ENDCLASS.
 
@@ -35,5 +39,39 @@ CLASS ZCL_ZMB_ODATA_GIT_1_DPC_EXT IMPLEMENTATION.
         SELECT SINGLE * FROM ZOVBAK INTO CORRESPONDING FIELDS OF er_entity WHERE vbeln = ls_vbeln.
      ENDIF .
 
+  endmethod.
+
+
+  method SOHEADERSET_CREATE_ENTITY.
+
+  DATA : wa_entity like er_entity ,
+         gs_zovbak type zovbak .
+  TRY.
+  CALL METHOD io_data_provider->read_entry_data
+    IMPORTING
+      es_data = wa_entity
+      .
+
+      IF wa_entity-vbeln is not INITIAL .
+        MOVE-CORRESPONDING wa_entity TO gs_zovbak .
+        modify zovbak from gs_zovbak.
+
+         MOVE-CORRESPONDING wa_entity to er_entity .
+
+         er_entity-remark = 'Record Created'.
+
+      ENDIF .
+    CATCH /iwbep/cx_mgw_tech_exception.
+  ENDTRY.
+
+
+
+  endmethod.
+
+
+  method SOHEADERSET_GET_ENTITYSET.
+
+
+        SELECT * FROM ZOVBAK INTO CORRESPONDING FIELDS OF TABLE et_entityset .
   endmethod.
 ENDCLASS.
