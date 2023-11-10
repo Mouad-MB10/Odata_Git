@@ -6,11 +6,13 @@ class ZCL_ZMB_ODATA_GIT_1_DPC_EXT definition
 public section.
 protected section.
 
+  methods SOHEADERSET_CREATE_ENTITY
+    redefinition .
   methods SOHEADERSET_GET_ENTITY
     redefinition .
   methods SOHEADERSET_GET_ENTITYSET
     redefinition .
-  methods SOHEADERSET_CREATE_ENTITY
+  methods SOHEADERSET_UPDATE_ENTITY
     redefinition .
 private section.
 ENDCLASS.
@@ -73,5 +75,30 @@ CLASS ZCL_ZMB_ODATA_GIT_1_DPC_EXT IMPLEMENTATION.
 
 
         SELECT * FROM ZOVBAK INTO CORRESPONDING FIELDS OF TABLE et_entityset .
+  endmethod.
+
+
+  method SOHEADERSET_UPDATE_ENTITY.
+  DATA : wa_entity like er_entity ,
+         gs_zovbak type zovbak .
+  TRY.
+  CALL METHOD io_data_provider->read_entry_data
+    IMPORTING
+      es_data = wa_entity
+      .
+
+      IF wa_entity-vbeln is not INITIAL .
+        MOVE-CORRESPONDING wa_entity TO gs_zovbak .
+        modify zovbak from gs_zovbak.
+
+
+
+         er_entity-remark = 'Record Modifyed Successfully'.
+
+         MOVE-CORRESPONDING wa_entity to er_entity .
+
+      ENDIF .
+    CATCH /iwbep/cx_mgw_tech_exception.
+  ENDTRY.
   endmethod.
 ENDCLASS.
