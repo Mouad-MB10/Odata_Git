@@ -43,6 +43,48 @@ CLASS ZCL_ZMB_ODATA_GIT_1_DPC_EXT IMPLEMENTATION.
         SELECT SINGLE * FROM ZOVBAK INTO CORRESPONDING FIELDS OF er_entity WHERE vbeln = ls_vbeln.
      ENDIF .
 
+*raise Exception
+
+IF er_entity-vbeln is INITIAL .
+  data: lo_message_container type REF TO /iwbep/if_message_container ,
+        lv_msg_text type bapi_msg .
+
+  lo_message_container = mo_context->get_message_container( ) .
+  lv_msg_text = 'Sales Order Does Not Exist ' .
+  CALL METHOD lo_message_container->add_message_text_only
+    EXPORTING
+      iv_msg_type               =     'E'              " Message Type - defined by GCS_MESSAGE_TYPE
+      iv_msg_text               =      lv_msg_text           " Message Text
+*      iv_error_category         =                  " Error category - defined by GCS_ERROR_CATEGORY
+*      iv_is_leading_message     = abap_true        " Flags this message as the leading error message
+*      iv_entity_type            =                  " Entity type/name
+*      it_key_tab                =                  " Entity key as name-value pair
+*      iv_add_to_response_header = abap_false       " Flag for adding or not the message to the response header
+*      iv_message_target         =                  " Target (reference) (e.g. Property ID) of a message
+*      it_message_target         =                  " Table of targets in addition to the message target
+*      iv_omit_target            = abap_false       " Set to TRUE if message has no target
+*      iv_is_transition_message  = abap_false       " Is transition message?
+*      iv_content_id             =                  " ContentID Value
+    .
+
+      RAISE EXCEPTION TYPE /iwbep/cx_mgw_busi_exception
+        EXPORTING
+*          textid                 =
+*          previous               =
+          message_container      =  lo_message_container .
+*          http_status_code       =
+*          http_header_parameters =
+*          sap_note_id            =
+*          msg_code               =
+*          exception_category     =
+*          entity_type            =
+*          message                =
+*          message_unlimited      =
+*          filter_param           =
+*          operation_no           =
+      .
+ENDIF .
+
   endmethod.
 
 
