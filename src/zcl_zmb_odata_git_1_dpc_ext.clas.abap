@@ -14,6 +14,8 @@ protected section.
     redefinition .
   methods SOHEADERSET_UPDATE_ENTITY
     redefinition .
+  methods SOHEADERSET_DELETE_ENTITY
+    redefinition .
 private section.
 ENDCLASS.
 
@@ -100,5 +102,19 @@ CLASS ZCL_ZMB_ODATA_GIT_1_DPC_EXT IMPLEMENTATION.
       ENDIF .
     CATCH /iwbep/cx_mgw_tech_exception.
   ENDTRY.
+  endmethod.
+
+
+  method SOHEADERSET_DELETE_ENTITY.
+
+   read table it_key_tab into data(gs_key_tab) with key name = 'Vbeln' .
+   IF gs_key_tab is not INITIAL .
+    DATA: lv_vbeln type vbeln .
+
+    lv_vbeln = gs_key_tab-value .
+
+    DELETE from zovbak where vbeln = lv_vbeln .
+  ENDIF .
+
   endmethod.
 ENDCLASS.
