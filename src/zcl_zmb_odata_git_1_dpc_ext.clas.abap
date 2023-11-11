@@ -76,7 +76,36 @@ CLASS ZCL_ZMB_ODATA_GIT_1_DPC_EXT IMPLEMENTATION.
   method SOHEADERSET_GET_ENTITYSET.
 
 
-        SELECT * FROM ZOVBAK INTO CORRESPONDING FIELDS OF TABLE et_entityset .
+           "$filter depending on the range specified on the parameter.
+    DATA: r_vbeln  TYPE RANGE OF zovbak-vbeln,
+          ls_vbeln LIKE LINE OF r_vbeln.
+
+
+    DATA : ls_filter_select_options TYPE /iwbep/s_mgw_select_option,
+           lt_select_options        TYPE /iwbep/t_cod_select_options,
+           ls_select_options        TYPE /iwbep/s_cod_select_option.
+
+    READ TABLE it_filter_select_options INTO ls_filter_select_options
+    WITH KEY property = 'Vbeln'.
+
+    IF ls_filter_select_options-property IS NOT INITIAL.
+
+      lt_select_options[] = ls_filter_select_options-select_options[].
+
+      LOOP AT lt_select_options INTO ls_select_options.
+
+        ls_vbeln-sign = ls_select_options-sign.
+        ls_vbeln-option = ls_select_options-option.
+        ls_vbeln-low = ls_select_options-low.
+        ls_vbeln-high = ls_select_options-high.
+        APPEND ls_vbeln TO r_vbeln.
+        CLEAR ls_select_options.
+      ENDLOOP.
+
+    ENDIF.
+    SELECT * FROM zovbak
+    INTO CORRESPONDING FIELDS OF TABLE et_entityset
+    WHERE vbeln IN r_vbeln.
   endmethod.
 
 
